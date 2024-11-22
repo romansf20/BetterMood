@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { View, Text, StyleSheet } from 'react-native';
 
@@ -10,82 +10,88 @@ import GrowScreen from './grow';
 import ProfileScreen from './profile';
 import CheckinScreen from './check';
 
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialTopTabNavigator();
 
-const CustomHeader = ({ title }) => {
-    return (
+const CustomHeader = ({ title }: { title: string }) => (
+    <View>
         <View style={styles.header}>
             <Text style={styles.headerTitle}>{title}</Text>
         </View>
-    );
-};
+        <View style={styles.headerLine} />
+    </View>
+);
+
+// Wrapper Component for Screen Content and Header
+const ScreenWithHeader = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <View style={{ flex: 1 }}>
+        <CustomHeader title={title} />
+        {children}
+    </View>
+);
 
 const AppLayout = forwardRef((props, ref) => {
     return (
         <NavigationContainer>
             <Tab.Navigator
+                tabBarPosition="bottom" // Position the tab bar at the bottom
                 screenOptions={{
                     tabBarStyle: {
-                        position: 'absolute',
-                        bottom: 0, // Adjust to align tabs at the bottom
-                        backgroundColor: '#f8f8f8', // Default tab background
+                        backgroundColor: '#f8f8f8',
                         borderTopWidth: 1,
                         borderTopColor: '#ddd',
-                        elevation: 0,
                     },
                     tabBarActiveTintColor: '#6200ee',
                     tabBarInactiveTintColor: '#a1a1a1',
-                    headerShown: true, // Show the header
+                    tabBarIndicatorStyle: {
+                        backgroundColor: '#6200ee',
+                        height: 3,
+                    },
                 }}
             >
-                <Tab.Screen 
-                    name="Dashboard" 
-                    component={DashboardScreen} 
+                <Tab.Screen
+                    name="Dashboard"
                     options={{
                         tabBarLabel: 'Dash',
-                        header: () => <CustomHeader title="Dashboard" />, // Custom header
                         tabBarIcon: ({ color, size }) => (
                             <Icon name="bar-chart" color={color} size={size} />
                         ),
-												animation: 'shift', // Apply shift animation here
                     }}
-                />
-                <Tab.Screen 
-                    name="Check-in" 
-                    component={CheckinScreen} 
+                >
+                    {() => <ScreenWithHeader title="Dashboard"><DashboardScreen /></ScreenWithHeader>}
+                </Tab.Screen>
+                <Tab.Screen
+                    name="Check-in"
                     options={{
                         tabBarLabel: 'Check-in',
-                        header: () => <CustomHeader title="Check-in" />, // Custom header
                         tabBarIcon: ({ color, size }) => (
                             <Icon name="how-to-reg" color={color} size={size} />
                         ),
-												animation: 'shift', // Apply shift animation here
                     }}
-                />
-                <Tab.Screen 
-                    name="Grow" 
-                    component={GrowScreen} 
+                >
+                    {() => <ScreenWithHeader title="Check-in"><CheckinScreen /></ScreenWithHeader>}
+                </Tab.Screen>
+                <Tab.Screen
+                    name="Grow"
                     options={{
                         tabBarLabel: 'Grow',
-                        header: () => <CustomHeader title="Grow" />, // Custom header
                         tabBarIcon: ({ color, size }) => (
                             <Icon name="trending-up" color={color} size={size} />
                         ),
-												animation: 'shift', // Apply shift animation here
                     }}
-                />
-                <Tab.Screen 
-                    name="Profile" 
-                    component={ProfileScreen} 
+                >
+                    {() => <ScreenWithHeader title="Grow"><GrowScreen /></ScreenWithHeader>}
+                </Tab.Screen>
+                <Tab.Screen
+                    name="Profile"
                     options={{
                         tabBarLabel: 'Profile',
-                        header: () => <CustomHeader title="Profile" />, // Custom header
                         tabBarIcon: ({ color, size }) => (
                             <Icon name="person" color={color} size={size} />
                         ),
-												animation: 'shift', // Apply shift animation here
                     }}
-                />
+                >
+                    {() => <ScreenWithHeader title="Profile"><ProfileScreen /></ScreenWithHeader>}
+                </Tab.Screen>
             </Tab.Navigator>
         </NavigationContainer>
     );
@@ -106,6 +112,11 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: '#333',
+    },
+    headerLine: {
+        height: 1,
+        backgroundColor: '#ddd',
+        width: '100%',
     },
 });
 
