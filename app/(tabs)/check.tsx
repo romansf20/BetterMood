@@ -1,14 +1,14 @@
 import React from 'react';
-import { View, Image, StyleSheet, Text } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 
 export default function DashboardScreen() {
   return (
     <View style={styles.container}>
-			<Image
-				// eslint-disable-next-line @typescript-eslint/no-require-imports
-				source={require('@/assets/images/check.png')}
-				style={[styles.headerImage]}
-				/>
+      <Image
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        source={require('@/assets/images/check.png')}
+        style={styles.headerImage}
+      />
     </View>
   );
 }
@@ -16,14 +16,12 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
+    justifyContent: 'center', // Center vertically
+    alignItems: 'center',    // Center horizontally
   },
-	headerImage: {
-    width: '100%',
-    height: 540,
-    resizeMode: 'cover',		
-		marginBottom: 55
+  headerImage: {
+    height: 620,
+    resizeMode: 'cover',
+    transform: [{ scale: 0.97 }], // Scale image proportionally to 98%
   },
 });

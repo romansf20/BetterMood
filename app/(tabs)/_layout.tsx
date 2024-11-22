@@ -10,6 +10,8 @@ import GrowScreen from './grow';
 import ProfileScreen from './profile';
 import CheckinScreen from './check';
 
+const SELECTED_STATE_COLOR = "#54487f"; // TODO: this should live in a Tokens file from Design System
+
 const Tab = createMaterialTopTabNavigator();
 
 const CustomHeader = ({ title }: { title: string }) => (
@@ -23,9 +25,11 @@ const CustomHeader = ({ title }: { title: string }) => (
 
 // Wrapper Component for Screen Content and Header
 const ScreenWithHeader = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <View style={{ flex: 1 }}>
+    <View style={styles.screenContainer}>
         <CustomHeader title={title} />
-        {children}
+        <View style={styles.screenContent}>
+            {children}
+        </View>
     </View>
 );
 
@@ -40,11 +44,12 @@ const AppLayout = forwardRef((props, ref) => {
                         borderTopWidth: 1,
                         borderTopColor: '#ddd',
                     },
-                    tabBarActiveTintColor: '#6200ee',
+                    tabBarActiveTintColor: SELECTED_STATE_COLOR,
                     tabBarInactiveTintColor: '#a1a1a1',
                     tabBarIndicatorStyle: {
-                        backgroundColor: '#6200ee',
-                        height: 3,
+                        backgroundColor: SELECTED_STATE_COLOR,
+                        height: 2,
+                        top: 0, // Move the indicator to the top of the navigation bar
                     },
                 }}
             >
@@ -103,8 +108,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 4, // Shadow for Android
-        shadowOpacity: 0.2, // Shadow for iOS
+        // elevation: 4, // Shadow for Android
+        // shadowOpacity: 0.2, // Shadow for iOS
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 3,
     },
@@ -117,6 +122,14 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: '#ddd',
         width: '100%',
+    },
+    screenContainer: {
+        flex: 1,
+        backgroundColor: '#f1f1f5', // Background color for each screen
+    },
+    screenContent: {
+        flex: 1,
+        padding: 16, // Optional: Padding for the screen content
     },
 });
 

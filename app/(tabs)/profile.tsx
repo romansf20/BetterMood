@@ -1,10 +1,14 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 
-export default function ProfileScreen() {
+export default function DashboardScreen() {
   return (
     <View style={styles.container}>
-      <Text>profile Screen</Text>
+      <Image
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        source={require('@/assets/images/profile.png')}
+        style={styles.headerImage}
+      />
     </View>
   );
 }
@@ -12,8 +16,12 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
+    justifyContent: 'center', // Center vertically
+    alignItems: 'center',    // Center horizontally
+  },
+  headerImage: {
+    height: 620,
+    resizeMode: 'cover',
+    transform: [{ scale: 0.97 }], // Scale image proportionally to 98%
   },
 });
