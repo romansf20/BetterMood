@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 
-export default function DashboardScreen() {
+export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <Image

@@ -2,14 +2,18 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import BreathingAnimation from "../Breath";
 
-export default function DashboardScreen() {
+export default function GrowScreen({ resetAnimation }) {
   const [activeTab, setActiveTab] = useState('Calm');
   const [animationKey, setAnimationKey] = useState(0); // Key for animation restart
 
   // Increment animation key whenever screen renders
   React.useEffect(() => {
-    setAnimationKey((prevKey) => prevKey + 1);
-  }, []);
+		if (resetAnimation) {
+      // Handle reset logic if needed (e.g., restarting animation)
+			setAnimationKey((prevKey) => prevKey + 1);
+    }
+    
+  }, [resetAnimation]);
 
   return (
     <View style={styles.container}>
@@ -38,7 +42,7 @@ export default function DashboardScreen() {
         </View>
         <View style={styles.breathingAnimationContainer}>
           {/* Use the animationKey to remount BreathingAnimation */}
-          <BreathingAnimation key={animationKey} />
+          <BreathingAnimation key={animationKey} activeTab={activeTab} />
         </View>
       </View>
     </View>

@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -34,6 +34,9 @@ const ScreenWithHeader = ({ title, children }: { title: string; children: React.
 );
 
 const AppLayout = forwardRef((props, ref) => {
+	
+	const [resetAnimation, setResetAnimation] = useState(false);
+
     return (
         <NavigationContainer>
             <Tab.Navigator
@@ -84,7 +87,7 @@ const AppLayout = forwardRef((props, ref) => {
                         ),
                     }}
                 >
-                    {() => <ScreenWithHeader title="Grow"><GrowScreen /></ScreenWithHeader>}
+                    {() => <ScreenWithHeader title="Grow"><GrowScreen resetAnimation={resetAnimation}/></ScreenWithHeader>}
                 </Tab.Screen>
                 <Tab.Screen
                     name="Profile"
