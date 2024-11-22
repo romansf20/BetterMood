@@ -4,11 +4,9 @@ import { View, Image, StyleSheet, Text } from 'react-native';
 export default function DashboardScreen() {
   return (
     <View style={styles.container}>
-      {/* <Text>Dashboard Screen</Text> */}
-			
 			<Image
 				// eslint-disable-next-line @typescript-eslint/no-require-imports
-				source={require('@/assets/images/dash.png')}
+				source={require('@/assets/images/check.png')}
 				style={[styles.headerImage]}
 				/>
     </View>
@@ -24,7 +22,8 @@ const styles = StyleSheet.create({
   },
 	headerImage: {
     width: '100%',
-    height: 500,
+    height: 540,
     resizeMode: 'cover',		
+		marginBottom: 55
   },
 });
