@@ -7,7 +7,7 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 const tabWidth = 60;
 const horizGap = 20;
 
-export default function GrowScreen({ resetAnimation }) {
+export default function GrowScreen() {
   const [activeTab, setActiveTab] = useState('Calm');
   const underlinePosition = useRef(new Animated.Value(0)).current;
 
@@ -23,6 +23,7 @@ export default function GrowScreen({ resetAnimation }) {
   return (
     <View style={styles.container}>
       <Image
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         source={require('@/assets/images/grow.png')}
         style={styles.headerImage}
       />

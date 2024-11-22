@@ -35,8 +35,6 @@ const ScreenWithHeader = ({ title, children }: { title: string; children: React.
 
 const AppLayout = forwardRef((props, ref) => {
 	
-	const [resetAnimation, setResetAnimation] = useState(false);
-
     return (
         <NavigationContainer>
             <Tab.Navigator
@@ -87,7 +85,7 @@ const AppLayout = forwardRef((props, ref) => {
                         ),
                     }}
                 >
-                    {() => <ScreenWithHeader title="Grow"><GrowScreen resetAnimation={resetAnimation}/></ScreenWithHeader>}
+                    {() => <ScreenWithHeader title="Grow"><GrowScreen/></ScreenWithHeader>}
                 </Tab.Screen>
                 <Tab.Screen
                     name="Profile"

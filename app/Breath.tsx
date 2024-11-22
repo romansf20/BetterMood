@@ -15,7 +15,6 @@ const WORD_FADE_OUT_DURATION = 200;
 const INHALE_DURATION = 4000;
 const EXHALE_DURATION = 4000;
 const HOLD_DURATION1 = 4000;
-const HOLD_DURATION2 = 4000;
 const START_DELAY = 1000;
 
 // Circle size constants
