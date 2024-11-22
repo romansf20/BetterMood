@@ -1,24 +1,28 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Image, StyleSheet, Animated, Dimensions } from 'react-native';
 import BreathingAnimation from "../Breath";
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
+
+const tabWidth = 60;
+const horizGap = 20;
 
 export default function GrowScreen({ resetAnimation }) {
   const [activeTab, setActiveTab] = useState('Calm');
-  const [animationKey, setAnimationKey] = useState(0); // Key for animation restart
+  const underlinePosition = useRef(new Animated.Value(0)).current;
 
-  // Increment animation key whenever screen renders
-  React.useEffect(() => {
-		if (resetAnimation) {
-      // Handle reset logic if needed (e.g., restarting animation)
-			setAnimationKey((prevKey) => prevKey + 1);
-    }
-    
-  }, [resetAnimation]);
+  useEffect(() => {
+    // Animate underline position
+    Animated.timing(underlinePosition, {
+      toValue: activeTab === 'Calm' ? 0 : tabWidth + horizGap,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [activeTab]);
 
   return (
     <View style={styles.container}>
       <Image
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
         source={require('@/assets/images/grow.png')}
         style={styles.headerImage}
       />
@@ -30,19 +34,23 @@ export default function GrowScreen({ resetAnimation }) {
             onPress={() => setActiveTab('Calm')}
           >
             <Text style={[styles.tabText, activeTab === 'Calm' && styles.activeTabText]}>Calm</Text>
-            {activeTab === 'Calm' && <View style={styles.activeLine} />}
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.tab}
             onPress={() => setActiveTab('Sleep')}
           >
             <Text style={[styles.tabText, activeTab === 'Sleep' && styles.activeTabText]}>Sleep</Text>
-            {activeTab === 'Sleep' && <View style={styles.activeLine} />}
           </TouchableOpacity>
+          {/* Sliding underline */}
+          <Animated.View
+            style={[
+              styles.activeLine,
+              { transform: [{ translateX: underlinePosition }] },
+            ]}
+          />
         </View>
         <View style={styles.breathingAnimationContainer}>
-          {/* Use the animationKey to remount BreathingAnimation */}
-          <BreathingAnimation key={animationKey} activeTab={activeTab} />
+          <BreathingAnimation activeTab={activeTab} />
         </View>
       </View>
     </View>
@@ -71,13 +79,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: -10,
     marginTop: -26,
+    // position: 'relative', // Needed for absolute positioning of the underline
+    // width: '100%',
   },
   breathingAnimationContainer: {
     marginTop: 20,
   },
   tab: {
+    // flex: 1,
     paddingVertical: 10,
-    paddingHorizontal: 20,
+		paddingHorizontal: horizGap,
     alignItems: 'center',
   },
   tabText: {
@@ -89,9 +100,10 @@ const styles = StyleSheet.create({
   },
   activeLine: {
     position: 'absolute',
-    bottom: 2,
+    bottom: 0,
+		left: 8,
     height: 2,
-    width: '120%',
+    width: tabWidth,
     backgroundColor: SELECTED_STATE_COLOR,
   },
 });

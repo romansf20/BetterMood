@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
+  cancelAnimation,
   Easing,
-	cancelAnimation
 } from "react-native-reanimated";
-import { useIsFocused } from "@react-navigation/native"; // Import the hook
-
+import { useIsFocused } from "@react-navigation/native";
 
 // Animation duration and size constants
 const WORD_FADE_IN_DURATION = 400;
@@ -23,112 +22,147 @@ const START_DELAY = 1000;
 const OUTER_CIRCLE_SIZE = 190;
 const INNER_CIRCLE_SIZE_INITIAL = 106;
 
-const BreathingAnimation = ({activeTab = "Calm"}) => {
-	const isFocused = useIsFocused();
+const BreathingAnimation = ({ activeTab = "Calm" }) => {
+  const isFocused = useIsFocused();
   const circleDiameter = useSharedValue(INNER_CIRCLE_SIZE_INITIAL); // Initial size of the inner circle
   const wordOpacity = useSharedValue(0); // Word opacity
-  const [currentWord, setCurrentWord] = useState("Inhale"); // Current word
+  const [currentWord, setCurrentWord] = useState("");
+  const timeoutRefs = useRef([]); // Store timers
+
+  // Clear all active timers
+  const clearAllTimers = () => {
+    timeoutRefs.current.forEach((id) => clearTimeout(id));
+    timeoutRefs.current = [];
+  };
 
   useEffect(() => {
-		if (!isFocused) return; // Start animation only when the tab is active
-
-    const startAnimation = async () => {
-      await new Promise((resolve) => setTimeout(resolve, START_DELAY)); // Initial delay
-      while (isFocused) {
-        // "Inhale" phase
-        setCurrentWord("Inhale");
-        wordOpacity.value = withTiming(1, { duration: WORD_FADE_IN_DURATION }); // Fade in
-        await new Promise((resolve) => setTimeout(resolve, WORD_FADE_IN_DURATION)); // Wait for fade-in
-        circleDiameter.value = withTiming(OUTER_CIRCLE_SIZE, {
-          duration: INHALE_DURATION,
-          easing: Easing.linear,
-        }); // Expand circle
-        await new Promise((resolve) => setTimeout(resolve, INHALE_DURATION)); // Wait for expansion
-        wordOpacity.value = withTiming(0, { duration: WORD_FADE_OUT_DURATION }); // Fade out
-        await new Promise((resolve) => setTimeout(resolve, WORD_FADE_OUT_DURATION)); // Wait for fade-out
-
-        // "Hold" phase
-        setCurrentWord("Hold");
-        wordOpacity.value = withTiming(1, { duration: WORD_FADE_IN_DURATION }); // Fade in
-        await new Promise((resolve) => setTimeout(resolve, WORD_FADE_IN_DURATION)); // Wait for fade-in
-        await new Promise((resolve) => setTimeout(resolve, HOLD_DURATION1)); // Hold for duration
-        wordOpacity.value = withTiming(0, { duration: WORD_FADE_OUT_DURATION }); // Fade out
-        await new Promise((resolve) => setTimeout(resolve, WORD_FADE_OUT_DURATION)); // Wait for fade-out
-
-        // "Exhale" phase
-        setCurrentWord("Exhale");
-        wordOpacity.value = withTiming(1, { duration: WORD_FADE_IN_DURATION }); // Fade in
-        await new Promise((resolve) => setTimeout(resolve, WORD_FADE_IN_DURATION)); // Wait for fade-in
-        circleDiameter.value = withTiming(INNER_CIRCLE_SIZE_INITIAL, {
-          duration: EXHALE_DURATION,
-          easing: Easing.linear,
-        }); // Shrink circle
-        await new Promise((resolve) => setTimeout(resolve, EXHALE_DURATION)); // Wait for shrink
-        wordOpacity.value = withTiming(0, { duration: WORD_FADE_OUT_DURATION }); // Fade out
-        await new Promise((resolve) => setTimeout(resolve, WORD_FADE_OUT_DURATION)); // Wait for fade-out
-
-				// "Hold" phase
-				setCurrentWord("Hold");
-				wordOpacity.value = withTiming(1, { duration: WORD_FADE_IN_DURATION }); // Fade in
-				await new Promise((resolve) => setTimeout(resolve, WORD_FADE_IN_DURATION)); // Wait for fade-in
-				await new Promise((resolve) => setTimeout(resolve, HOLD_DURATION2)); // Hold for duration
-				wordOpacity.value = withTiming(0, { duration: WORD_FADE_OUT_DURATION }); // Fade out
-				await new Promise((resolve) => setTimeout(resolve, WORD_FADE_OUT_DURATION)); // Wait for fade-out
-      }
-    };
-
-		const resetAnimations = () => {
+    // Function to reset animations
+    const resetAnimations = () => {
       cancelAnimation(circleDiameter);
       cancelAnimation(wordOpacity);
       circleDiameter.value = INNER_CIRCLE_SIZE_INITIAL;
-      wordOpacity.value = 1;
-      // setCurrentWord("");
+      wordOpacity.value = 0;
+      setCurrentWord(""); // Reset displayed word
+      clearAllTimers();
     };
-		resetAnimations();
 
-		if (activeTab === "Calm") {
-			setCurrentWord("4x4x4x4");
-		} else if (activeTab === "Sleep") {
-			setCurrentWord("4-7-8");
-		}
-		
-		wordOpacity.value = withTiming(1, { duration: WORD_FADE_IN_DURATION });
+    // Start animation sequence
+    const startAnimation = async () => {
+      await new Promise((resolve) => {
+        const id = setTimeout(resolve, START_DELAY);
+        timeoutRefs.current.push(id);
+      });
 
-		setTimeout(() => {
-			// resume animation sequence after 2 seconds
-			wordOpacity.value = withTiming(0, { duration: WORD_FADE_OUT_DURATION }); // Fade out
-			setTimeout(() => {
-				setCurrentWord("");
-				startAnimation();
-			}, WORD_FADE_OUT_DURATION);
+      while (isFocused) {
+        // "Inhale" phase
+        setCurrentWord("Inhale");
+        wordOpacity.value = withTiming(1, { duration: WORD_FADE_IN_DURATION });
+        await new Promise((resolve) => {
+          const id = setTimeout(resolve, WORD_FADE_IN_DURATION);
+          timeoutRefs.current.push(id);
+        });
 
-		}, 2000);
+        circleDiameter.value = withTiming(OUTER_CIRCLE_SIZE, {
+          duration: INHALE_DURATION,
+          easing: Easing.linear,
+        });
+        await new Promise((resolve) => {
+          const id = setTimeout(resolve, INHALE_DURATION);
+          timeoutRefs.current.push(id);
+        });
 
-    // startAnimation();
-	}, [isFocused, activeTab]);
+        wordOpacity.value = withTiming(0, { duration: WORD_FADE_OUT_DURATION });
+        await new Promise((resolve) => {
+          const id = setTimeout(resolve, WORD_FADE_OUT_DURATION);
+          timeoutRefs.current.push(id);
+        });
+
+        // "Hold" phase
+        setCurrentWord("Hold");
+        wordOpacity.value = withTiming(1, { duration: WORD_FADE_IN_DURATION });
+        await new Promise((resolve) => {
+          const id = setTimeout(resolve, WORD_FADE_IN_DURATION);
+          timeoutRefs.current.push(id);
+        });
+
+        await new Promise((resolve) => {
+          const id = setTimeout(resolve, HOLD_DURATION1);
+          timeoutRefs.current.push(id);
+        });
+
+        wordOpacity.value = withTiming(0, { duration: WORD_FADE_OUT_DURATION });
+        await new Promise((resolve) => {
+          const id = setTimeout(resolve, WORD_FADE_OUT_DURATION);
+          timeoutRefs.current.push(id);
+        });
+
+        // "Exhale" phase
+        setCurrentWord("Exhale");
+        wordOpacity.value = withTiming(1, { duration: WORD_FADE_IN_DURATION });
+        await new Promise((resolve) => {
+          const id = setTimeout(resolve, WORD_FADE_IN_DURATION);
+          timeoutRefs.current.push(id);
+        });
+
+        circleDiameter.value = withTiming(INNER_CIRCLE_SIZE_INITIAL, {
+          duration: EXHALE_DURATION,
+          easing: Easing.linear,
+        });
+        await new Promise((resolve) => {
+          const id = setTimeout(resolve, EXHALE_DURATION);
+          timeoutRefs.current.push(id);
+        });
+
+        wordOpacity.value = withTiming(0, { duration: WORD_FADE_OUT_DURATION });
+        await new Promise((resolve) => {
+          const id = setTimeout(resolve, WORD_FADE_OUT_DURATION);
+          timeoutRefs.current.push(id);
+        });
+      }
+    };
+
+    resetAnimations(); // Reset animations on mount
+
+    if (isFocused) {
+      if (activeTab === "Calm") {
+        setCurrentWord("4-4-4-4");
+      } else if (activeTab === "Sleep") {
+        setCurrentWord("4-7-8");
+      }
+
+      wordOpacity.value = withTiming(1, { duration: WORD_FADE_IN_DURATION });
+
+      const id = setTimeout(() => {
+        wordOpacity.value = withTiming(0, { duration: WORD_FADE_OUT_DURATION });
+        const innerId = setTimeout(() => {
+          setCurrentWord("");
+          startAnimation();
+        }, WORD_FADE_OUT_DURATION);
+        timeoutRefs.current.push(innerId);
+      }, 2000);
+      timeoutRefs.current.push(id);
+    }
+
+    return () => {
+      resetAnimations(); // Cleanup on unmount or dependency change
+    };
+  }, [isFocused, activeTab]);
 
   // Animated styles
-  const animatedCircleStyle = useAnimatedStyle(() => {
-    return {
-      width: circleDiameter.value,
-      height: circleDiameter.value,
-      borderRadius: circleDiameter.value / 2,
-    };
-  });
+  const animatedCircleStyle = useAnimatedStyle(() => ({
+    width: circleDiameter.value,
+    height: circleDiameter.value,
+    borderRadius: circleDiameter.value / 2,
+  }));
 
-  const animatedTextStyle = useAnimatedStyle(() => {
-    return {
-      opacity: wordOpacity.value,
-    };
-  });
+  const animatedTextStyle = useAnimatedStyle(() => ({
+    opacity: wordOpacity.value,
+  }));
 
   return (
     <View style={styles.container}>
-      {/* Static Outer Circle */}
       <View style={styles.outerCircle}>
-        {/* Animated Inner Circle */}
         <Animated.View style={[styles.innerCircle, animatedCircleStyle]}>
-          {/* Animated Text */}
           <Animated.Text style={[styles.text, animatedTextStyle]}>
             {currentWord}
           </Animated.Text>
