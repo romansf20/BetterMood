@@ -4,8 +4,6 @@ import { View, Image, StyleSheet, Text } from 'react-native';
 export default function DashboardScreen() {
   return (
     <View style={styles.container}>
-      {/* <Text>Dashboard Screen</Text> */}
-			
 			<Image
 				// eslint-disable-next-line @typescript-eslint/no-require-imports
 				source={require('@/assets/images/dash.png')}
